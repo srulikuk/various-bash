@@ -25,14 +25,17 @@ for i in "${email[@]}" ; do
   mapfile -t user_files < <(find "$user_path" -maxdepth 1 -type f -name '*[0-9].' ! -name '*[!0-9]*.')
   for file in "${user_files[@]}" ; do
     # Get the FROM text
-    grep '^From: ' "$file" | sed 's/<.*//; s/"//g; s/\\//g; s/[[:blank:]]*$//' >> "${w_dir}/from_line" # using sed as <email> might be on next line
+    grep '^From: ' "$file" | sed 's/<.*//; s/"//g; s/\\//g; s/[[:blank:]]*$//' >> "${w_dir}/from_line.tmp" # using sed as <email> might be on next line
     mapfile -t tmp < <(grep -A1 '^Subject: ' "$file") # subject line can sometimes be split over 2 lines
     if grep -q "^ " <<< "${tmp[1]}" ; then # if subject is split over 2 lines second line starts with a space
       subject=$(printf '%s\n' "${tmp[*]}" | tr -d \\r) # merge the 2 lines
     fi
-    printf '%s\n' "${subject##*SPAM\*\*\* }" >> "${w_dir}/subject_line"
+    printf '%s\n' "${subject##*SPAM\*\*\* }" >> "${w_dir}/subject_line.tmp"
   done
 done
+
+sort -u "${w_dir}/from_line.tmp" > "${w_dir}/from_line"
+sort -u "${w_dir}/subject_line.tmp" > "${w_dir}/subject_line"
 
 touch "${r_dir}/from_line"
 touch "${r_dir}/subject_line"
@@ -40,10 +43,10 @@ touch "${r_dir}/subject_line"
 for file in from_line subject_line ; do
   while read -r line ; do
     [[ -z $line ]] && continue
-    if grep -q "${line}$" "${r_dir}/${file}" ; then
-      continue
-    fi
-    count=$(grep -c "$line" "${w_dir}/$file")
+    # if grep -q "${line}$" "${r_dir}/${file}" ; then
+    #   continue
+    # fi
+    count=$(grep -c "$line" "${w_dir}/${file}.tmp")
     if ((count > 3)) ; then # dont bother with anything that does not have at least 4 matches
       printf '%s, %s\n' "$count" "$line" >> "${r_dir}/${file}"
     fi
