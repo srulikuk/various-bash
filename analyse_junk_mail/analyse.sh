@@ -5,6 +5,9 @@ c_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 source "${c_dir}/lc_src.sh"
 
+mkdir -p "$w_dir"
+mkdir -p "$r_dir"
+
 userDetails()
 {
   [[ $1 =~ ((.).*)"|"((.).*)"|"(.*) ]]
