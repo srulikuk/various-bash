@@ -39,6 +39,7 @@ for file in from_line subject_line ; do
     count=$(grep -c "$line" "${w_dir}/$file")
     if ((count > 1)) ; then
       printf '%s, %s\n' "$count" "$line" >> "${r_dir}/${file}"
+      sed -i "/$line/d" "${w_dir}/$file"
     fi
   done < "${w_dir}/$file"
   sort -n "${r_dir}/${file}" > "${r_dir}/${file}.tmp"
@@ -47,3 +48,4 @@ for file in from_line subject_line ; do
 done
 
 printf '%s\n' "${out_msg[@]}"
+printf 'To delete the tmp files run rm -r %s\n' "$w_dir"
