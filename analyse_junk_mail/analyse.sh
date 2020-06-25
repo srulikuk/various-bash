@@ -25,7 +25,7 @@ for i in "${email[@]}" ; do
   mapfile -t user_files < <(find "$user_path" -maxdepth 1 -type f -name '*[0-9].' ! -name '*[!0-9]*.')
   for file in "${user_files[@]}" ; do
     # Get the FROM text
-    grep '^From: ' "$file" | sed 's/<.*//; s/"//g; s/\\//g' >> "${w_dir}/from_line" # using sed as <email> might be on next line
+    grep '^From: ' "$file" | sed 's/<.*//; s/"//g; s/\\//g; s/[[:blank:]]*$//' >> "${w_dir}/from_line" # using sed as <email> might be on next line
     mapfile -t tmp < <(grep -A1 '^Subject: ' "$file") # subject line can sometimes be split over 2 lines
     if grep -q "^ " <<< "${tmp[1]}" ; then # if subject is split over 2 lines second line starts with a space
       subject=$(printf '%s\n' "${tmp[*]}" | tr -d \\r) # merge the 2 lines
@@ -48,5 +48,5 @@ for file in from_line subject_line ; do
   out_msg+=("Result for $file is at ${r_dir}/${file}")
 done
 
+out_msg+=("To delete the tmp files run rm -r $w_dir")
 printf '%s\n' "${out_msg[@]}"
-printf 'To delete the tmp files run rm -r %s\n' "$w_dir"
