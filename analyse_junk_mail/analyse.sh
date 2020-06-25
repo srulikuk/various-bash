@@ -34,9 +34,15 @@ for i in "${email[@]}" ; do
   done
 done
 
+touch "${r_dir}/from_line"
+touch "${r_dir}/subject_line"
+
 for file in from_line subject_line ; do
   while read -r line ; do
     [[ -z $line ]] && continue
+    if grep "$line" "${r_dir}/${file}" ; then
+      continue
+    fi
     count=$(grep -c "$line" "${w_dir}/$file")
     if ((count > 3)) ; then # dont bother with anything that does not have at least 4 matches
       printf '%s, %s\n' "$count" "$line" >> "${r_dir}/${file}"
