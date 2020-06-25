@@ -11,7 +11,6 @@ mkdir -p "$r_dir"
 userDetails()
 {
   [[ $1 =~ ((.).*)"|"((.).*)"|"(.*) ]]
-  BASH_REMATCH
   user="${BASH_REMATCH[1]}"
   u="${BASH_REMATCH[2]}"
   domain="${BASH_REMATCH[3]}"
@@ -26,7 +25,7 @@ for i in "${email[@]}" ; do
   mapfile -t user_files < <(find "$user_path" -maxdepth 1 -type f -name '*[0-9].' ! -name '*[!0-9]*.')
   for file in "${user_files[@]}" ; do
     # Get the FROM text
-    grep '^From: ' "$file" | sed 's/<.*//; s/"//g' >> "${w_dir}/from_line" # using sed as <email> might be on next line
+    grep '^From: ' "$file" | sed 's/<.*//; s/"//g; s/\\//g' >> "${w_dir}/from_line" # using sed as <email> might be on next line
     mapfile -t tmp < <(grep -A1 '^Subject: ' "$file") # subject line can sometimes be split over 2 lines
     if grep -q "^ " <<< "${tmp[1]}" ; then # if subject is split over 2 lines second line starts with a space
       subject=$(printf '%s\n' "${tmp[*]}" | tr -d \\r) # merge the 2 lines
