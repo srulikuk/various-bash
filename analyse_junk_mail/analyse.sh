@@ -36,7 +36,7 @@ done
 
 for file in from_line subject_line ; do
   while read -r line ; do
-    count=$(grep -c "$line" "$file")
+    count=$(grep -c "$line" "${w_dir}/$file")
     if ((count > 1)) ; then
       printf '%s, %s\n' "$count" "$line" >> "${r_dir}/${file}"
     fi
