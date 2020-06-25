@@ -40,7 +40,7 @@ touch "${r_dir}/subject_line"
 for file in from_line subject_line ; do
   while read -r line ; do
     [[ -z $line ]] && continue
-    if grep "${line}$" "${r_dir}/${file}" ; then
+    if grep -q "${line}$" "${r_dir}/${file}" ; then
       continue
     fi
     count=$(grep -c "$line" "${w_dir}/$file")
