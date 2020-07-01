@@ -8,10 +8,12 @@ if ! [[ -f ${c_dir}/lc_analyse.cfg ]] ; then
 fi
 shopt -q extglob || shopt -s extglob # turn on extglob
 
+source "${c_dir}/lc_analyse.cfg"
+
 tmp=("${r_dir}/results_*[-1]")
 f_dir="$tmp"
 
-if ! [[ -f "${f_dir}/from" ]] ; then
+if [[ -f "${f_dir}/from" ]] ; then
   header+=("from")
 fi
 if [[ -f "${f_dir}/subject" ]] ; then
