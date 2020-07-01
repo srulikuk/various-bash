@@ -10,8 +10,8 @@ shopt -q extglob || shopt -s extglob # turn on extglob
 
 source "${c_dir}/lc_analyse.cfg"
 
-tmp=("${r_dir}"_*[-1])
-f_dir="$tmp"
+tmp=("${r_dir}"_*)
+f_dir="${tmp[-1]}"
 
 if [[ -f "${f_dir}/from" ]] ; then
   header+=("from")
