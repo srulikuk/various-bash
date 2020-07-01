@@ -11,6 +11,10 @@ shopt -q extglob || shopt -s extglob # turn on extglob
 
 source "${c_dir}/lc_analyse.cfg"
 
+f_date=$(date +%s) # date for dir names
+w_dir="${w_dir}_$f_date"
+r_dir="${r_dir}_$f_date"
+
 mkdir -p "$w_dir"
 mkdir -p "$r_dir"
 
