@@ -30,7 +30,7 @@ userDetails()
 # analyse.sh will prompt if to update the lc_last.run file if
 # running in test mode select 'no' to the update prompt.
 last_date=()
-if [[ -f ${c_dir}lc_last.run ]] ; then
+if [[ -f ${c_dir}/lc_last.run ]] ; then
   last_date[0]="-newermt"
   last_date[1]="$(date '+%Y-%m-%d %H:%M:%S' -d @"$(<"${c_dir}/lc_last.run")")"
   printf 'Last run time was at %s\n' "${last_date[1]}"
@@ -66,21 +66,21 @@ for file in from_line subject_line ; do
         # if there is check if its exact match
         if grep -iq "[(|]${line}[|)]" "/etc/spamassassin/custom_${name}.cf"; then
           # If its an exact match consider changing the score
-          if [[ -f ${w_dir}/${name}_info_same ]] ; then
+          if ! [[ -f ${w_dir}/info_same ]] ; then
             printf '\n\n# NOTE: Still getting spam with following in %s header. Consider
-  # changing the score for following in /etc/spamassassin/custom_%s.cf\n;' "$name" "$name"
+  # changing the score for following in /etc/spamassassin/custom_%s.cf;\n' "$name" "$name" > "${w_dir}/info_same"
             same_e=1
           fi
-          printf '# Line #%s - "%s"\n' "$(grep -in "[(|]${line}[|)]" "/etc/spamassassin/custom_${name}.cf" | awk -F":" '{print $1}')" "$line" >> "${w_dir}/${name}_info_same"
+          printf '# Line #%s - "%s"\n' "$(grep -in "[(|]${line}[|)]" "/etc/spamassassin/custom_${name}.cf" | awk -F":" '{print $1}')" "$line" >> "${w_dir}/info_same"
           continue
         else
           # if its a shorter match consider replacing the match
-          if [[ -f ${w_dir}/${name}_info_short ]] ; then
+          if ! [[ -f ${w_dir}/info_short ]] ; then
             printf '\n\n# NOTE: Consider changing the following %s header
-  # match to the shorter ones /etc/spamassassin/custom_%s.cf\n;' "$name" "$name"
+  # match to the shorter ones /etc/spamassassin/custom_%s.cf;\n' "$name" "$name" > "${w_dir}/info_short"
             short_e=1
           fi
-          printf '# Line #%s: shorter match: "%s"\n' "$(grep -in " ${name} =~ .*${line}" "/etc/spamassassin/custom_${name}.cf" | awk -F":" '{print $1}')" "$line" >> "${w_dir}/${name}_info_short"
+          printf '# Line #%s: shorter match: "%s"\n' "$(grep -in " ${name} =~ .*${line}" "/etc/spamassassin/custom_${name}.cf" | awk -F":" '{print $1}')" "$line" >> "${w_dir}/info_short"
         fi
         continue
       fi
@@ -99,11 +99,11 @@ for file in from_line subject_line ; do
 done
 
 if ((same_e == 1)) ; then
-  cat "${w_dir}/${name}_info_same" > "${w_dir}/${name}_notes"
+  cat "${w_dir}/info_same" > "${r_dir}/notes"
   notes_e=1
 fi
 if ((short_e == 1)) ; then
-  cat "${w_dir}/${name}_info_short" >> "${w_dir}/${name}_notes"
+  cat "${w_dir}/info_short" >> "${r_dir}/notes"
   notes_e=1
 fi
 
@@ -118,13 +118,14 @@ if ((result_e != 1)) ; then
 else
   sa_msg="\nTo create spamassassin rules ready  to place in the SA config files
 amend put the phrases for each properly formatted in its respective
-file $r_dir/from & $r_dir/subject i.e /(phrase 1| phrase 2| etc)/i
+file $r_dir/from & $r_dir/subject
+ -i.e /(phrase 1|phrase 2|.phrase 3.|phrase 4|etc...)/i
 and run \"${c_dir}/sa_rules.sh\"\n"
 fi
 ((notes_e == 1)) && out_msg+=("Some NOTES about existing matches in ${r_dir}/_notes")
 out_msg+=("To delete the tmp files run rm -r $w_dir")
 
-if [[ $- == *i* ]] ; then
+if [ -t 1 ] ; then
   printf '\nUpdate last run time? [y/n] > '
   read -r
   [[ $REPLY =~ ^(y|yes)$ ]] && run_date=1
