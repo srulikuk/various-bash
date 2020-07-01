@@ -10,7 +10,7 @@ shopt -q extglob || shopt -s extglob # turn on extglob
 
 source "${c_dir}/lc_analyse.cfg"
 
-tmp=("${r_dir}"/_*[-1])
+tmp=("${r_dir}"_*[-1])
 f_dir="$tmp"
 
 if [[ -f "${f_dir}/from" ]] ; then
