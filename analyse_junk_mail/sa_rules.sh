@@ -34,7 +34,7 @@ for file in "${header[@]}" ; do
   while read -r line ; do
     line_a=$(printf 'header LOCAL_%s_%s_%s\t%s =~' "$e_time" "$count" "${file^^}" "${file^}")
     line_b=$(printf 'score LOCAL_%s_%s_%s\t%s\n' "$e_time" "$count" "${file^^}" "$score")
-    sed -i "s;$line;$line_a $line\n$line_b\n;" "${file}.cf"
+    sed -i "s;$line;$line_a $line\n$line_b\n;" "${file_p}.cf"
     count=$((count + 1))
   done < "$file_p"
   printf '%s.cf has been updated, place the rules in /etc/spamassassin/custom_%s.cf\n' "$file_p" "$file"
