@@ -27,8 +27,8 @@ fi
 e_time="${f_dir##*_}"
 
 # prepare spammassin rules
-count=1
 for file in "${header[@]}" ; do
+  count=1
   file_p="${f_dir}/${file}"
   cp "$file_p" "${file_p}.cf"
   while read -r line ; do
