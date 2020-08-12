@@ -31,8 +31,8 @@ for file in "${header[@]}" ; do
   count=1
   file_p="${f_dir}/${file}"
   cp "$file_p" "${file_p}.cf"
+  sed -i 's/ \+/\\s+/g' "${file_p}.cf"
   while read -r line ; do
-    line=$(sed 's/ \+/\\s+/g' <<< "$line")
     line_a=$(printf 'header LOCAL_%s_%s_%s\t%s =~' "$e_time" "$count" "${file^^}" "${file^}")
     line_b=$(printf 'score LOCAL_%s_%s_%s\t%s\n' "$e_time" "$count" "${file^^}" "$score")
     sed -i "s;$line;$line_a $line\n$line_b\n;" "${file_p}.cf"
