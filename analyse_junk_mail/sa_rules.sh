@@ -30,14 +30,16 @@ e_time="${f_dir##*_}"
 for file in "${header[@]}" ; do
   count=1
   file_p="${f_dir}/${file}"
-  cp "$file_p" "${file_p}.cf"
-  sed -i 's/ \+/\\s+/g' "${file_p}.cf"
+  cp "$file_p" "${file_p}.bkp"
+  sed -i 's/ \+/\\s+/g' "${file_p}.bkp"
   while read -r line ; do
-    line_a=$(printf 'header LOCAL_%s_%s_%s\t%s =~' "$e_time" "$count" "${file^^}" "${file^}")
-    line_b=$(printf 'score LOCAL_%s_%s_%s\t%s\n' "$e_time" "$count" "${file^^}" "$score")
-    sed -i "s;$line;$line_a $line\n$line_b\n;" "${file_p}.cf"
+    # line_a=$(printf 'header LOCAL_%s_%s_%s\t%s =~' "$e_time" "$count" "${file^^}" "${file^}")
+    # line_b=$(printf 'score LOCAL_%s_%s_%s\t%s\n' "$e_time" "$count" "${file^^}" "$score")
+    printf 'header LOCAL_%s_%s_%s\t%s =~ %s' "$e_time" "$count" "${file^^}" "${file^}" "$line" >> "${file_p}.cf"
+    printf 'score LOCAL_%s_%s_%s\t%s\n' "$e_time" "$count" "${file^^}" "$score" >> "${file_p}.cf"
+    # sed -i "s;$line;$line_a $line\n$line_b\n;" "${file_p}.cf"
     count=$((count + 1))
-  done < "$file_p"
+  done < "${file_p}.bkp"
   printf '%s.cf has been updated, place the rules in /etc/spamassassin/custom_%s.cf\n' "$file_p" "$file"
 done
 
